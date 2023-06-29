@@ -1,42 +1,10 @@
 import './App.scss';
-import React, { useState } from 'react';
-import { findUserById, getNewId, getPreparedTodos } from './helpers';
 import { TodoList } from './components/TodoList';
-import { usersFromServer } from './api/users';
-import { FullTodo, UpdateTodoArgs } from './types';
 import { TodoForm } from './components/TodoForm/TodoForm';
+import { useTodoContext } from './components/TodoContext/useTodoContext';
 
 export const App = () => {
-  const [todos, setTodos] = useState(getPreparedTodos);
-
-  const addTodo = (title: string, userId: number) => {
-    setTodos((prevTodos) => {
-      const newTodo: FullTodo = {
-        id: getNewId(prevTodos),
-        completed: false,
-        user: findUserById({ users: usersFromServer, userId }),
-        title,
-        userId,
-      };
-
-      return [...prevTodos, newTodo];
-    });
-  };
-
-  const updatedTodo = (args: UpdateTodoArgs) => {
-    setTodos((prevTodos) => prevTodos.map(todo => {
-      if (todo.id === args.todoId) {
-        return {
-          ...todo,
-          title: args.title,
-          userId: args.userId,
-          user: findUserById({ users: usersFromServer, userId: args.userId }),
-        };
-      }
-
-      return todo;
-    }));
-  };
+  const { addTodo } = useTodoContext();
 
   return (
     <div className="App">
@@ -44,7 +12,7 @@ export const App = () => {
 
       <TodoForm onSubmit={addTodo} submitButtonText="Add" />
 
-      <TodoList todos={todos} updateTodo={updatedTodo} />
+      <TodoList />
     </div>
   );
 };
