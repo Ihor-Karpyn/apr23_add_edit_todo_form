@@ -37,3 +37,15 @@ button {
 .UserInfo {
   font-style: italic;
 }
+
+.userInfo {
+  background-color: lightcyan;
+
+  position: fixed;
+  top: 10px;
+  right: 10px;
+
+  border: 2px dashed greenyellow;
+
+  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.5);
+}

@@ -1,50 +1,51 @@
+import { FC, useEffect, useState } from 'react';
+import { Todo } from './types';
 import './App.scss';
-import React, { useState } from 'react';
-import { findUserById, getNewId, getPreparedTodos } from './helpers';
-import { TodoList } from './components/TodoList';
-import { usersFromServer } from './api/users';
-import { FullTodo, UpdateTodoArgs } from './types';
-import { TodoForm } from './components/TodoForm/TodoForm';
+import { UserInfo } from './components/UserInfo';
 
-export const App = () => {
-  const [todos, setTodos] = useState(getPreparedTodos);
+export const App: FC = () => {
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
-  const addTodo = (title: string, userId: number) => {
-    setTodos((prevTodos) => {
-      const newTodo: FullTodo = {
-        id: getNewId(prevTodos),
-        completed: false,
-        user: findUserById({ users: usersFromServer, userId }),
-        title,
-        userId,
-      };
+  useEffect(() => {
+    setIsLoading(true);
 
-      return [...prevTodos, newTodo];
-    });
-  };
-
-  const updatedTodo = (args: UpdateTodoArgs) => {
-    setTodos((prevTodos) => prevTodos.map(todo => {
-      if (todo.id === args.todoId) {
-        return {
-          ...todo,
-          title: args.title,
-          userId: args.userId,
-          user: findUserById({ users: usersFromServer, userId: args.userId }),
-        };
-      }
-
-      return todo;
-    }));
-  };
+    fetch('https://mate.academy/students-api/todos')
+      .then((response) => response.json())
+      .then(setTodos)
+      .finally(() => setIsLoading(false));
+  }, []);
 
   return (
-    <div className="App">
-      <h1>Add todo form</h1>
+    <>
+      <h1>App</h1>
 
-      <TodoForm onSubmit={addTodo} submitButtonText="Add" />
+      <UserInfo userId={selectedUserId} />
 
-      <TodoList todos={todos} updateTodo={updatedTodo} />
-    </div>
+      {isLoading && <h2>Loading...</h2>}
+
+      <ul>
+        {todos.map((todo) => (
+          <li key={todo.id}>
+            <p>
+              {todo.title}
+            </p>
+            <button
+              type="button"
+              onClick={() => setSelectedUserId(todo.userId)}
+              style={{
+                backgroundColor: todo.userId === selectedUserId
+                  ? 'yellow'
+                  : 'silver',
+              }}
+            >
+              {todo.userId}
+            </button>
+            <hr />
+          </li>
+        ))}
+      </ul>
+    </>
   );
 };
