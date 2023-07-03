@@ -1,11 +1,11 @@
 import { FC, useState } from 'react';
 import { TodoInfo } from '../TodoInfo';
-import { FullTodo, UpdateTodoArgs } from '../../types';
+import { Todo, UpdateTodoArgs } from '../../types';
 import { TodoForm } from '../TodoForm/TodoForm';
 
 interface Props {
-  todos: FullTodo[];
-  updateTodo: (args: UpdateTodoArgs) => void;
+  todos: Todo[];
+  updateTodo: (todoId: number, args: UpdateTodoArgs) => Promise<Todo | null>;
 }
 
 export const TodoList: FC<Props> = ({ todos, updateTodo }) => {
@@ -13,14 +13,15 @@ export const TodoList: FC<Props> = ({ todos, updateTodo }) => {
 
   const onEdit = (todoId: number) => setEditedTodoId(todoId);
 
-  const onEditSubmit = (title: string, userId: number, todoId: number) => {
-    updateTodo({
-      todoId,
-      userId,
+  const onEditSubmit = async (title: string, todoId: number, completed: boolean) => {
+    const updatedTodo = await updateTodo(todoId, {
       title,
+      completed,
     });
 
     setEditedTodoId(null);
+
+    return updatedTodo;
   };
 
   return (
@@ -30,11 +31,10 @@ export const TodoList: FC<Props> = ({ todos, updateTodo }) => {
           {todo.id === editedTodoId
             ? (
               <TodoForm
-                onSubmit={(title, userId) => (
-                  onEditSubmit(title, userId, todo.id)
+                onSubmit={(title) => (
+                  onEditSubmit(title, todo.id, todo.completed)
                 )}
                 initialTitle={todo.title}
-                initialUserId={todo.userId}
                 submitButtonText="Save"
               />
             )

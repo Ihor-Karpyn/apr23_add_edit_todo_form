@@ -1,10 +1,9 @@
 import React, { FC, useState } from 'react';
-import { usersFromServer } from '../../api/users';
+import { Todo } from '../../types';
 
 interface Props {
-  onSubmit: (title: string, userId: number) => void;
+  onSubmit: (title: string) => Promise<Todo | null>;
   initialTitle?: string;
-  initialUserId?: number;
   submitButtonText: string;
 }
 
@@ -12,42 +11,40 @@ export const TodoForm: FC<Props> = (props) => {
   const {
     onSubmit,
     initialTitle = '',
-    initialUserId = 0,
     submitButtonText,
   } = props;
 
   const [title, setTitle] = useState(initialTitle);
-  const [userId, setUserId] = useState<number>(initialUserId);
 
   const [isTitleError, setIsTitleError] = useState(false);
-  const [isUserError, setIsUserError] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const changeTitleHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
     setIsTitleError(false);
   };
 
-  const changeUserIdHandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setUserId(+event.target.value);
-    setIsUserError(false);
-  };
-
   const clearForm = () => {
     setTitle('');
-    setUserId(0);
   };
 
-  const submitHandler = () => {
-    if (!title || !userId) {
+  const submitHandler = async () => {
+    if (!title) {
       setIsTitleError(!title);
-      setIsUserError(!userId);
 
       return;
     }
 
-    onSubmit(title, userId);
+    setIsLoading(true);
 
-    clearForm();
+    const createdTodo = await onSubmit(title);
+
+    if (createdTodo) {
+      setIsLoading(false);
+
+      clearForm();
+    }
   };
 
   return (
@@ -69,27 +66,11 @@ export const TodoForm: FC<Props> = (props) => {
         )}
       </div>
 
-      <div className="field">
-        <select
-          data-cy="userSelect"
-          value={userId}
-          onChange={changeUserIdHandler}
-        >
-          <option value={0} disabled>Choose a user</option>
-
-          {usersFromServer.map(user => (
-            <option key={user.id} value={user.id}>
-              {user.name}
-            </option>
-          ))}
-        </select>
-
-        {isUserError && (
-          <span className="error">Please choose a user</span>
-        )}
-      </div>
-
-      <button type="submit" data-cy="submitButton">
+      <button
+        type="submit"
+        data-cy="submitButton"
+        disabled={isLoading}
+      >
         {submitButtonText}
       </button>
     </form>

@@ -1,10 +1,9 @@
 import { FC } from 'react';
 import cn from 'classnames';
-import { FullTodo } from '../../types';
-import { UserInfo } from '../UserInfo';
+import { Todo } from '../../types';
 
 interface Props {
-  todo: FullTodo;
+  todo: Todo;
   onEdit: (todoId: number) => void;
 }
 
@@ -17,10 +16,8 @@ export const TodoInfo: FC<Props> = ({ todo, onEdit }) => {
       })}
     >
       <h2 className="TodoInfo__title">
-        {todo.title}
+        {`#${todo.userId} ${todo.title}`}
       </h2>
-
-      {todo.user && <UserInfo user={todo.user} />}
 
       <button
         type="button"

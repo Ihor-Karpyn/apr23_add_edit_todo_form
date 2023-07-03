@@ -1,42 +1,65 @@
 import './App.scss';
-import React, { useState } from 'react';
-import { findUserById, getNewId, getPreparedTodos } from './helpers';
+import {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 import { TodoList } from './components/TodoList';
-import { usersFromServer } from './api/users';
-import { FullTodo, UpdateTodoArgs } from './types';
+import { Todo, UpdateTodoArgs, UpdateTodoArgsQ } from './types';
 import { TodoForm } from './components/TodoForm/TodoForm';
+import { todosApi } from './api/todos.api';
+import { showErrorMessage } from './helpers';
+
+const USER_ID = 4;
 
 export const App = () => {
-  const [todos, setTodos] = useState(getPreparedTodos);
+  const [todos, setTodos] = useState<Todo[]>([]);
 
-  const addTodo = (title: string, userId: number) => {
-    setTodos((prevTodos) => {
-      const newTodo: FullTodo = {
-        id: getNewId(prevTodos),
+  useEffect(() => {
+    todosApi.loadTodosByUserId(USER_ID)
+      .then(setTodos)
+      .catch(showErrorMessage);
+  }, []);
+
+  const addTodo = useCallback(async (title: string) => {
+    try {
+      const newTodo = await todosApi.createTodo({
+        userId: USER_ID,
         completed: false,
-        user: findUserById({ users: usersFromServer, userId }),
         title,
-        userId,
-      };
+      });
 
-      return [...prevTodos, newTodo];
-    });
+      setTodos((prevTodos) => [...prevTodos, newTodo]);
+
+      return newTodo;
+    } catch (error) {
+      showErrorMessage(error as Error);
+
+      return null;
+    }
+  }, []);
+
+  const updateTodo = async (todoId: number, args: UpdateTodoArgs) => {
+    try {
+      const updatedTodo = await todosApi.updateTodo(todoId, args);
+
+      setTodos((prevTodos) => prevTodos.map(todo => {
+        if (todo.id === todoId) {
+          return updatedTodo;
+        }
+
+        return todo;
+      }));
+
+      return updatedTodo;
+    } catch (error) {
+      showErrorMessage(error as Error);
+
+      return null;
+    }
   };
 
-  const updatedTodo = (args: UpdateTodoArgs) => {
-    setTodos((prevTodos) => prevTodos.map(todo => {
-      if (todo.id === args.todoId) {
-        return {
-          ...todo,
-          title: args.title,
-          userId: args.userId,
-          user: findUserById({ users: usersFromServer, userId: args.userId }),
-        };
-      }
-
-      return todo;
-    }));
-  };
+  const visibleTodos = useMemo(() => {
+    return todos.sort((a, b) => b.id - a.id);
+  }, [todos]);
 
   return (
     <div className="App">
@@ -44,7 +67,7 @@ export const App = () => {
 
       <TodoForm onSubmit={addTodo} submitButtonText="Add" />
 
-      <TodoList todos={todos} updateTodo={updatedTodo} />
+      <TodoList todos={visibleTodos} updateTodo={updateTodo} />
     </div>
   );
 };
