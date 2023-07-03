@@ -1,51 +1,25 @@
-import { FC, useState } from 'react';
-import { TodoInfo } from '../TodoInfo';
-import { FullTodo, UpdateTodoArgs } from '../../types';
-import { TodoForm } from '../TodoForm/TodoForm';
+import { FC } from 'react';
+import cn from 'classnames';
+import { Todo } from '../../types';
 
 interface Props {
-  todos: FullTodo[];
-  updateTodo: (args: UpdateTodoArgs) => void;
+  todos: Todo[];
 }
 
-export const TodoList: FC<Props> = ({ todos, updateTodo }) => {
-  const [editedTodoId, setEditedTodoId] = useState<number | null>(null);
-
-  const onEdit = (todoId: number) => setEditedTodoId(todoId);
-
-  const onEditSubmit = (title: string, userId: number, todoId: number) => {
-    updateTodo({
-      todoId,
-      userId,
-      title,
-    });
-
-    setEditedTodoId(null);
-  };
-
+export const TodoList: FC<Props> = ({ todos }) => {
   return (
     <section className="TodoList">
       {todos.map(todo => (
-        <>
-          {todo.id === editedTodoId
-            ? (
-              <TodoForm
-                onSubmit={(title, userId) => (
-                  onEditSubmit(title, userId, todo.id)
-                )}
-                initialTitle={todo.title}
-                initialUserId={todo.userId}
-                submitButtonText="Save"
-              />
-            )
-            : (
-              <TodoInfo
-                todo={todo}
-                key={todo.id}
-                onEdit={onEdit}
-              />
-            )}
-        </>
+        <article
+          data-id="15"
+          className={cn('TodoInfo', {
+            'TodoInfo--completed': todo.completed,
+          })}
+        >
+          <h2 className="TodoInfo__title">
+            {todo.title}
+          </h2>
+        </article>
       ))}
     </section>
   );

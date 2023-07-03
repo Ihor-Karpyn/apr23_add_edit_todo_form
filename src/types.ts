@@ -4,20 +4,3 @@ export interface Todo {
   completed: boolean;
   userId: number;
 }
-
-export interface User {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-}
-
-export interface FullTodo extends Todo {
-  user?: User;
-}
-
-export interface UpdateTodoArgs {
-  title: string,
-  userId: number,
-  todoId: number
-}

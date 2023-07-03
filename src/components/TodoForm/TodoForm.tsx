@@ -1,53 +1,25 @@
 import React, { FC, useState } from 'react';
-import { usersFromServer } from '../../api/users';
 
-interface Props {
-  onSubmit: (title: string, userId: number) => void;
-  initialTitle?: string;
-  initialUserId?: number;
-  submitButtonText: string;
-}
-
-export const TodoForm: FC<Props> = (props) => {
-  const {
-    onSubmit,
-    initialTitle = '',
-    initialUserId = 0,
-    submitButtonText,
-  } = props;
-
-  const [title, setTitle] = useState(initialTitle);
-  const [userId, setUserId] = useState<number>(initialUserId);
+export const TodoForm: FC = () => {
+  const [title, setTitle] = useState('');
 
   const [isTitleError, setIsTitleError] = useState(false);
-  const [isUserError, setIsUserError] = useState(false);
 
   const changeTitleHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
     setIsTitleError(false);
   };
 
-  const changeUserIdHandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setUserId(+event.target.value);
-    setIsUserError(false);
-  };
-
-  const clearForm = () => {
-    setTitle('');
-    setUserId(0);
-  };
-
   const submitHandler = () => {
-    if (!title || !userId) {
+    if (!title) {
       setIsTitleError(!title);
-      setIsUserError(!userId);
 
       return;
     }
 
-    onSubmit(title, userId);
+    // update
 
-    clearForm();
+    setTitle('');
   };
 
   return (
@@ -69,28 +41,8 @@ export const TodoForm: FC<Props> = (props) => {
         )}
       </div>
 
-      <div className="field">
-        <select
-          data-cy="userSelect"
-          value={userId}
-          onChange={changeUserIdHandler}
-        >
-          <option value={0} disabled>Choose a user</option>
-
-          {usersFromServer.map(user => (
-            <option key={user.id} value={user.id}>
-              {user.name}
-            </option>
-          ))}
-        </select>
-
-        {isUserError && (
-          <span className="error">Please choose a user</span>
-        )}
-      </div>
-
-      <button type="submit" data-cy="submitButton">
-        {submitButtonText}
+      <button type="submit">
+        Add todo
       </button>
     </form>
   );

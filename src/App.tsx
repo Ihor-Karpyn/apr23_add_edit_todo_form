@@ -1,50 +1,18 @@
 import './App.scss';
-import React, { useState } from 'react';
-import { findUserById, getNewId, getPreparedTodos } from './helpers';
+import { useState } from 'react';
 import { TodoList } from './components/TodoList';
-import { usersFromServer } from './api/users';
-import { FullTodo, UpdateTodoArgs } from './types';
 import { TodoForm } from './components/TodoForm/TodoForm';
 
 export const App = () => {
-  const [todos, setTodos] = useState(getPreparedTodos);
-
-  const addTodo = (title: string, userId: number) => {
-    setTodos((prevTodos) => {
-      const newTodo: FullTodo = {
-        id: getNewId(prevTodos),
-        completed: false,
-        user: findUserById({ users: usersFromServer, userId }),
-        title,
-        userId,
-      };
-
-      return [...prevTodos, newTodo];
-    });
-  };
-
-  const updatedTodo = (args: UpdateTodoArgs) => {
-    setTodos((prevTodos) => prevTodos.map(todo => {
-      if (todo.id === args.todoId) {
-        return {
-          ...todo,
-          title: args.title,
-          userId: args.userId,
-          user: findUserById({ users: usersFromServer, userId: args.userId }),
-        };
-      }
-
-      return todo;
-    }));
-  };
+  const [todos, setTodos] = useState([]);
 
   return (
     <div className="App">
       <h1>Add todo form</h1>
 
-      <TodoForm onSubmit={addTodo} submitButtonText="Add" />
+      <TodoForm />
 
-      <TodoList todos={todos} updateTodo={updatedTodo} />
+      <TodoList todos={todos} />
     </div>
   );
 };
