@@ -2,7 +2,7 @@ import './App.scss';
 import { useCallback, useEffect, useState } from 'react';
 import { TodoList } from './components/TodoList';
 import { TodoForm } from './components/TodoForm/TodoForm';
-import { Todo } from './types';
+import { Todo, UpdateTodoArgs } from './types';
 
 export const App = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -38,23 +38,49 @@ export const App = () => {
       });
   }, []);
 
-  const deleteTodo = useCallback((todoId: number): Promise<boolean> => {
-    return fetch(
+  const deleteTodo = useCallback(async (todoId: number): Promise<boolean> => {
+    const response = await fetch(
+      `https://mate.academy/students-api/todos/${todoId}`,
+      { method: 'DELETE' },
+    );
+
+    const responseData = await response.json();
+
+    const isDeleted = Boolean(responseData);
+
+    if (isDeleted) {
+      setTodos((prev) => prev.filter(todo => todo.id !== todoId));
+    }
+
+    return isDeleted;
+  }, []);
+
+  const updateTodo = useCallback(async (
+    todoId: number,
+    args: UpdateTodoArgs,
+  ): Promise<Todo> => {
+    const response = await fetch(
       `https://mate.academy/students-api/todos/${todoId}`,
       {
-        method: 'DELETE',
+        body: JSON.stringify(args),
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
       },
-    )
-      .then(response => response.json())
-      .then(response => {
-        const isDeleted = Boolean(response);
+    );
 
-        if (isDeleted) {
-          setTodos((prev) => prev.filter(todo => todo.id !== todoId));
-        }
+    const updatedTodo: Todo = await response.json();
 
-        return isDeleted;
-      });
+    setTodos(prevTodos => prevTodos.map(todo => {
+      if (todo.id !== todoId) {
+        return todo;
+      }
+
+      return updatedTodo;
+    }));
+
+    return updatedTodo;
   }, []);
 
   return (
@@ -63,7 +89,11 @@ export const App = () => {
 
       <TodoForm createTodo={createTodo} />
 
-      <TodoList todos={todos} deleteTodo={deleteTodo} />
+      <TodoList
+        todos={todos}
+        deleteTodo={deleteTodo}
+        updateTodo={updateTodo}
+      />
     </div>
   );
 };
