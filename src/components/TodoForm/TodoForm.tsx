@@ -1,8 +1,13 @@
 import React, { FC, useState } from 'react';
+import { Todo } from '../../types';
 
-export const TodoForm: FC = () => {
+interface Props {
+  createTodo: (title: string) => Promise<Todo>
+}
+
+export const TodoForm: FC<Props> = ({ createTodo }) => {
   const [title, setTitle] = useState('');
-
+  const [isLoading, setIsLoading] = useState(false);
   const [isTitleError, setIsTitleError] = useState(false);
 
   const changeTitleHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -10,15 +15,18 @@ export const TodoForm: FC = () => {
     setIsTitleError(false);
   };
 
-  const submitHandler = () => {
+  const submitHandler = async () => {
     if (!title) {
       setIsTitleError(!title);
 
       return;
     }
 
-    // update
+    setIsLoading(true);
 
+    await createTodo(title);
+
+    setIsLoading(false);
     setTitle('');
   };
 
@@ -41,7 +49,10 @@ export const TodoForm: FC = () => {
         )}
       </div>
 
-      <button type="submit">
+      <button
+        type="submit"
+        disabled={isLoading}
+      >
         Add todo
       </button>
     </form>
