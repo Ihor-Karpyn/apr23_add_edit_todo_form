@@ -38,13 +38,32 @@ export const App = () => {
       });
   }, []);
 
+  const deleteTodo = useCallback((todoId: number): Promise<boolean> => {
+    return fetch(
+      `https://mate.academy/students-api/todos/${todoId}`,
+      {
+        method: 'DELETE',
+      },
+    )
+      .then(response => response.json())
+      .then(response => {
+        const isDeleted = Boolean(response);
+
+        if (isDeleted) {
+          setTodos((prev) => prev.filter(todo => todo.id !== todoId));
+        }
+
+        return isDeleted;
+      });
+  }, []);
+
   return (
     <div className="App">
       <h1>Add todo form</h1>
 
       <TodoForm createTodo={createTodo} />
 
-      <TodoList todos={todos} />
+      <TodoList todos={todos} deleteTodo={deleteTodo} />
     </div>
   );
 };

@@ -1,25 +1,21 @@
 import { FC } from 'react';
-import cn from 'classnames';
 import { Todo } from '../../types';
+import { TodoInfo } from '../TodoInfo/TodoInfo';
 
 interface Props {
   todos: Todo[];
+  deleteTodo: (todoId: number) => Promise<boolean>;
 }
 
-export const TodoList: FC<Props> = ({ todos }) => {
+export const TodoList: FC<Props> = ({ todos, deleteTodo }) => {
   return (
     <section className="TodoList">
       {todos.map(todo => (
-        <article
-          data-id="15"
-          className={cn('TodoInfo', {
-            'TodoInfo--completed': todo.completed,
-          })}
-        >
-          <h2 className="TodoInfo__title">
-            {todo.title}
-          </h2>
-        </article>
+        <TodoInfo
+          todo={todo}
+          deleteTodo={deleteTodo}
+          key={todo.id}
+        />
       ))}
     </section>
   );
