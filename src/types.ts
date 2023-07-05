@@ -6,3 +6,4 @@ export interface Todo {
 }
 
 export type UpdateTodoArgs = Partial<Pick<Todo, 'title' | 'completed'>>;
+export type CreateTodoArgs = Pick<Todo, 'title' | 'completed' | 'userId'>;
