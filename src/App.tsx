@@ -20,7 +20,7 @@ export const App: FC = () => {
   const [letters, setLetters] = useState<(string[])[]>([['', 'a', '', 'b', ''], ['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', '']]);
   const [catcherPosition, setCatcherPosition] = useState<number>(0);
   const [name, setName] = useState<string[]>([]);
-  const catcherPositionRef = useRef<number>(0);
+  const catcherPositionRef = useRef<number>(-1);
 
   const moveRight = () => {
     setCatcherPosition((prev) => {
