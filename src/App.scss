@@ -2,38 +2,77 @@ iframe {
   display: none;
 }
 
-html {
-  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+* {
+  box-sizing: border-box;
 }
 
-label,
-button {
-  cursor: pointer;
+button:hover {
+  cursor: crosshair;
 }
 
-.error {
-  color: red;
+.field {
+  width: 266px;
 }
 
-.TodoInfo {
-  width: max-content;
-  padding: 8px;
-  margin: 12px 0;
-  border: 1px solid #000;
-  border-radius: 8px;
-  background-color: antiquewhite;
+.moveArea {
+  display: grid;
+  grid-template-columns: repeat(5, 50px);
+  grid-template-rows: repeat(5, 50px);
 
-  &__title {
-    margin: 4px 0;
-    font-size: inherit;
-    color: #f00;
+  gap: 4px;
+}
+
+.catcherWrapper {
+  display: grid;
+  grid-template-columns: repeat(5, 50px);
+  grid-template-rows: repeat(1, 5px);
+
+  gap: 4px;
+
+  margin-top: 10px;
+}
+
+.catcher {
+  width: 50px;
+  height: 10px;
+
+  border-bottom: 1px dashed black;
+  border-radius: 10%;
+
+  &-active {
+    border-bottom: 5px solid black;
+    border-left: 5px solid black;
+    border-right: 5px solid black;
   }
-
-  &--completed &__title {
-    color: #080;
-  }
 }
 
-.UserInfo {
-  font-style: italic;
+.letter {
+  font-size: 30px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: 1px dashed black;
+  border-radius: 10%;
+}
+
+.control {
+  display: flex;
+  gap: 50px;
+  margin-top: 30px;
+}
+
+.moveButton {
+  flex-grow: 1;
+
+  height: 50px;
+}
+
+.nameWrapper {
+  display: grid;
+  grid-template-columns: repeat(5, 50px);
+  grid-template-rows: repeat(1, 50px);
+
+  gap: 4px;
 }
